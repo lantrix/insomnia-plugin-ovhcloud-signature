@@ -1,0 +1,16 @@
+{
+  "name": "insomnia-plugin-ovhcloud-signature",
+  "version": "1.0.0",
+  "license": "BSD-3-Clause",
+  "author": "Lantrix",
+  "main": "plugin.js",
+  "insomnia": {
+    "name": "ovhCloudSignature",
+    "displayName": "OVH Cloud Signature Generator",
+    "description": "Generates the X-Ovh-Signature for OVH Cloud API requests."
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {}
+}
