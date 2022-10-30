@@ -9,8 +9,6 @@
     "displayName": "OVH Cloud Signature Generator",
     "description": "Generates the X-Ovh-Signature for OVH Cloud API requests."
   },
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }

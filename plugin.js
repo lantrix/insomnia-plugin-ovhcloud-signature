@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const lodash = require('lodash')
 
 module.exports.templateTags = [
   {
@@ -46,19 +45,18 @@ module.exports.requestHooks = [async (context) => {
   console.log("ck " + ck)
   const requestUrl = context.request.getUrl();
   console.log("requestUrl " + requestUrl)
-  const body = context.request.getBody();
-  let requestBody;
-  if(lodash.isEmpty(body)) {
-   requestBody = ""
-  } else {
-    requestBody = body
-  }
   console.log("requestBody " + requestBody);
   const httpMethod = context.request.getMethod().toUpperCase();
-  console.log("httpMethod " + httpMethod)
+  const body = context.request.getBody()
+  let requestBody = '';
+  if (typeof(body) === 'object' && Object.keys(body).length > 0) {
+    if (httpMethod === 'PUT' || httpMethod === 'POST') {
+      // Escape unicode
+      requestBody = JSON.parse(body.text);
+    }
+  }
   const timestamp = Math.round(Date.now() / 1000)
   context.request.setHeader("X-Ovh-Timestamp", timestamp);
   const signature = signOvhRequest(as, ck, httpMethod, requestUrl, requestBody, timestamp)
   context.request.setHeader("X-Ovh-Signature", signature);
 }]
-
