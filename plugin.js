@@ -4,7 +4,7 @@ module.exports.templateTags = [
   {
     name: 'ovhsignature',
     displayName: 'OVH Signature',
-    description: 'Sign OVH CLoud API requests',
+    description: 'Sign OVH Cloud API requests',
 
     args: [
       {
@@ -33,19 +33,17 @@ module.exports.templateTags = [
 ]
 
 function signOvhRequest(as, ck, httpMethod, url, body, timestamp) {
-    let signed = [ as, ck, httpMethod, url, '', timestamp ];
-    return '$1$' + crypto.createHash('sha1').update(signed.join('+')).digest('hex');
+  if (typeof(body) === 'object' && Object.keys(body).length > 0) {
+    body = JSON.stringify(body, null)
+  }
+  let signed = [ as, ck, httpMethod, url, body, timestamp ];
+  return '$1$' + crypto.createHash('sha1').update(signed.join('+')).digest('hex');
 }
 
 module.exports.requestHooks = [async (context) => {
-  console.log("Inserting X-Ovh-Signature into http headers")
   const as = await context.store.getItem("ovhcloud-as")
-  console.log("as " + as)
   const ck = await context.store.getItem("ovhcloud-ck")
-  console.log("ck " + ck)
   const requestUrl = context.request.getUrl();
-  console.log("requestUrl " + requestUrl)
-  console.log("requestBody " + requestBody);
   const httpMethod = context.request.getMethod().toUpperCase();
   const body = context.request.getBody()
   let requestBody = '';
@@ -56,7 +54,9 @@ module.exports.requestHooks = [async (context) => {
     }
   }
   const timestamp = Math.round(Date.now() / 1000)
+  console.log("Inserting X-Ovh-Timestamp into http headers")
   context.request.setHeader("X-Ovh-Timestamp", timestamp);
   const signature = signOvhRequest(as, ck, httpMethod, requestUrl, requestBody, timestamp)
+  console.log("Inserting X-Ovh-Signature into http headers")
   context.request.setHeader("X-Ovh-Signature", signature);
 }]

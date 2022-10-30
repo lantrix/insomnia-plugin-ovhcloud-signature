@@ -61,7 +61,38 @@ Provide the values manually or from your private environment variables:
 
 ![request example](./.github/assets/insomnia-edit-tag.png)
 
+**NB:** Ignore the Live Preview error
+
 The plugin will generate and add the headers:
 
  - `X-Ovh-Timestamp`
  - `X-Ovh-Signature`
+
+## Important Minification in JSON Body Text
+
+Because of the way `PUT` and `POST` methods need the JSON body included in the signature, currently the body of your request needs to be minified with no spaces, for example when editing a credential with `PUT` on the `/1.0/me/api/credential/<credentialId>` endpoint:
+
+The body might be like this, and [must be fully minified](https://stackoverflow.com/a/48487241).
+
+```json
+{"allowedIPs":["127.0.0.1/32","127.0.0.2/32"]}
+```
+
+This results in the insomnia request Timeline being:
+
+```
+> PUT /1.0/me/api/credential/553184188 HTTP/1.1
+> Host: api.ovh.com
+> User-Agent: insomnia/2022.6.0
+> Content-Type: application/json
+> Accept: application/json
+> X-Ovh-Application: 1234567890abcdef
+> X-Ovh-Consumer: 0987654321defabc
+> X-Ovh-Timestamp: 1667135223
+> X-Ovh-Signature: $1$0987654321123456789009876543211234567890
+> Content-Length: 51
+
+| {"allowedIPs":["127.0.0.1/32","127.0.0.2/32"]}
+```
+
+If there are spaces in your JSON body, the plugin currently can't generate a matching signature. A future TODO for sure.
